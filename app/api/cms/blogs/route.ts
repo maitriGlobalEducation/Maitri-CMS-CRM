@@ -13,6 +13,17 @@ export async function POST(request: NextRequest) {
       content,
       cardImage,
       contentImage,
+
+      // SEO
+      metaTitle,
+      metaDescription,
+      metaKeywords,
+      focusKeyword,
+
+      // CTA
+      ctaText,
+      ctaLink,
+
       status,
       featured,
     } = body;
@@ -75,6 +86,18 @@ export async function POST(request: NextRequest) {
 
       cardImage: cardImage ?? null,
       contentImage: contentImage ?? null,
+
+      // SEO
+      metaTitle: metaTitle?.trim() ?? "",
+      metaDescription: metaDescription?.trim() ?? "",
+      metaKeywords: Array.isArray(metaKeywords)
+        ? metaKeywords.map((keyword: string) => keyword.trim()).filter(Boolean)
+        : [],
+      focusKeyword: focusKeyword?.trim() ?? "",
+
+      // CTA
+      ctaText: ctaText?.trim() ?? "",
+      ctaLink: ctaLink?.trim() ?? "",
 
       status,
       featured: Boolean(featured),

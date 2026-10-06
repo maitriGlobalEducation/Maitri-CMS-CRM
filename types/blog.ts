@@ -18,6 +18,16 @@ export interface Blog {
   // Tiptap rich-text JSON
   content: Record<string, unknown>;
 
+  // SEO
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string[];
+  focusKeyword: string;
+
+  // CTA
+  ctaText: string;
+  ctaLink: string;
+
   status: BlogStatus;
   featured: boolean;
 

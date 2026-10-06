@@ -17,7 +17,19 @@ interface BlogFormData {
   title: string;
   slug: string;
   category: string;
+
   content: Record<string, unknown>;
+
+  // SEO
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string[];
+  focusKeyword: string;
+
+  // CTA
+  ctaText: string;
+  ctaLink: string;
+
   status: BlogStatus;
   featured: boolean;
 }
@@ -35,7 +47,19 @@ const initialFormData: BlogFormData = {
   title: "",
   slug: "",
   category: "",
+
   content: emptyContent,
+
+  // SEO
+  metaTitle: "",
+  metaDescription: "",
+  metaKeywords: [],
+  focusKeyword: "",
+
+  // CTA
+  ctaText: "",
+  ctaLink: "",
+
   status: "draft",
   featured: false,
 };
@@ -53,7 +77,19 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
         title: blog.title,
         slug: blog.slug,
         category: blog.category,
+
         content: blog.content,
+
+        // SEO
+        metaTitle: blog.metaTitle ?? "",
+        metaDescription: blog.metaDescription ?? "",
+        metaKeywords: blog.metaKeywords ?? [],
+        focusKeyword: blog.focusKeyword ?? "",
+
+        // CTA
+        ctaText: blog.ctaText ?? "",
+        ctaLink: blog.ctaLink ?? "",
+
         status: blog.status,
         featured: blog.featured,
       });
@@ -166,6 +202,13 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
         blog ? "Blog updated successfully" : "Blog created successfully",
       );
 
+      // Clear the form after creating a new blog
+      if (!blog) {
+        setFormData(initialFormData);
+        setImages([]);
+        setCardImageIndex(0);
+      }
+
       onSuccess();
     } catch (error) {
       console.error(blog ? "UPDATE BLOG ERROR:" : "CREATE BLOG ERROR:", error);
@@ -185,7 +228,10 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-xl border border-zinc-200 bg-white"
+    >
       <div className="space-y-8 p-6">
         {/* Basic information */}
         <FormSection
@@ -229,11 +275,10 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
           </div>
         </FormSection>
 
-        {/* Media placeholder */}
+        {/* Blog images */}
         <FormSection
           title="Blog Images"
-          description=" Upload up to two images. If you upload one image, it will be used for
-          both the blog card and blog page."
+          description="Upload up to two images. If you upload one image, it will be used for both the blog card and blog page."
         >
           <BlogImageUploader
             images={images}
@@ -252,6 +297,110 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
             content={formData.content}
             onChange={(content) => updateField("content", content)}
           />
+        </FormSection>
+
+        {/* SEO */}
+        <FormSection
+          title="SEO"
+          description="Optimize this blog for search engines."
+        >
+          <div className="space-y-5">
+            <FormField label="Meta title">
+              <input
+                type="text"
+                value={formData.metaTitle}
+                onChange={(e) => updateField("metaTitle", e.target.value)}
+                placeholder="e.g. Study in Italy: Universities, Costs & Requirements"
+                maxLength={60}
+                className={inputStyles}
+              />
+
+              <p className="mt-1.5 text-xs text-zinc-400">
+                {formData.metaTitle.length}/60 characters
+              </p>
+            </FormField>
+
+            <FormField label="Meta description">
+              <textarea
+                value={formData.metaDescription}
+                onChange={(e) => updateField("metaDescription", e.target.value)}
+                placeholder="Write a short description that explains what this article is about."
+                maxLength={160}
+                rows={4}
+                className={`${inputStyles} resize-none`}
+              />
+
+              <p className="mt-1.5 text-xs text-zinc-400">
+                {formData.metaDescription.length}/160 characters
+              </p>
+            </FormField>
+
+            <div className="grid grid-cols-2 gap-5">
+              <FormField label="Meta keywords">
+                <input
+                  type="text"
+                  value={formData.metaKeywords.join(", ")}
+                  onChange={(e) =>
+                    updateField(
+                      "metaKeywords",
+                      e.target.value
+                        .split(",")
+                        .map((keyword) => keyword.trim())
+                        .filter(Boolean),
+                    )
+                  }
+                  placeholder="e.g. study abroad, Italy, Italian universities"
+                  className={inputStyles}
+                />
+
+                <p className="mt-1.5 text-xs text-zinc-400">
+                  Separate keywords with commas.
+                </p>
+              </FormField>
+
+              <FormField label="Focus keyword">
+                <input
+                  type="text"
+                  value={formData.focusKeyword}
+                  onChange={(e) => updateField("focusKeyword", e.target.value)}
+                  placeholder="e.g. study in Italy"
+                  className={inputStyles}
+                />
+
+                <p className="mt-1.5 text-xs text-zinc-400">
+                  Choose one primary keyword for this article.
+                </p>
+              </FormField>
+            </div>
+          </div>
+        </FormSection>
+
+        {/* CTA */}
+        <FormSection
+          title="Call to Action"
+          description="Add an optional call to action that will appear at the end of the blog."
+        >
+          <div className="grid grid-cols-2 gap-5">
+            <FormField label="CTA text">
+              <input
+                type="text"
+                value={formData.ctaText}
+                onChange={(e) => updateField("ctaText", e.target.value)}
+                placeholder="e.g. Talk to Our Education Experts"
+                className={inputStyles}
+              />
+            </FormField>
+
+            <FormField label="CTA link">
+              <input
+                type="text"
+                value={formData.ctaLink}
+                onChange={(e) => updateField("ctaLink", e.target.value)}
+                placeholder="e.g. /contact"
+                className={inputStyles}
+              />
+            </FormField>
+          </div>
         </FormSection>
 
         {/* Publishing */}
@@ -297,6 +446,7 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
         </FormSection>
       </div>
 
+      {/* Error */}
       {submitError && (
         <div className="mx-6 mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {submitError}
@@ -304,19 +454,22 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
       )}
 
       {/* Footer */}
-      <div className="sticky bottom-0 z-10 flex justify-end gap-3 border-t border-zinc-200 bg-white px-6 py-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="rounded-lg border cursor-pointer hover:bg-zinc-100 border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition"
-        >
-          Cancel
-        </button>
+      <div className="flex justify-end gap-3 rounded-b-xl border-t border-zinc-200 bg-white px-6 py-4">
+        {blog && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="cursor-pointer rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Cancel Edit
+          </button>
+        )}
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-zinc-950 cursor-pointer px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer rounded-lg bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? "Saving..." : blog ? "Save Changes" : "Create Blog"}
         </button>

@@ -54,6 +54,43 @@ const BlogSchema = new Schema(
       required: true,
     },
 
+    // SEO
+    metaTitle: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    metaDescription: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    metaKeywords: {
+      type: [String],
+      default: [],
+    },
+
+    focusKeyword: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    // CTA
+    ctaText: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    ctaLink: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     status: {
       type: String,
       enum: ["draft", "published"],

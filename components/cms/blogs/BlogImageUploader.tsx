@@ -98,7 +98,7 @@ export default function BlogImageUploader({
               key={image.publicId}
               className="overflow-hidden rounded-xl border border-zinc-200 bg-white"
             >
-              <div className="relative h-52 bg-zinc-100">
+              <div className="relative h-72 bg-zinc-100">
                 <img
                   src={image.url}
                   alt={`Blog upload ${index + 1}`}

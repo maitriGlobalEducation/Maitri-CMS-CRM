@@ -34,6 +34,17 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       content,
       cardImage,
       contentImage,
+
+      // SEO
+      metaTitle,
+      metaDescription,
+      metaKeywords,
+      focusKeyword,
+
+      // CTA
+      ctaText,
+      ctaLink,
+
       status,
       featured,
     } = body;
@@ -123,10 +134,25 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     existingBlog.title = title.trim();
     existingBlog.slug = normalizedSlug;
     existingBlog.category = category.trim();
+
     existingBlog.content = content;
 
     existingBlog.cardImage = cardImage ?? null;
     existingBlog.contentImage = contentImage ?? null;
+
+    // SEO
+    existingBlog.metaTitle = metaTitle?.trim() ?? "";
+    existingBlog.metaDescription = metaDescription?.trim() ?? "";
+
+    existingBlog.metaKeywords = Array.isArray(metaKeywords)
+      ? metaKeywords.map((keyword: string) => keyword.trim()).filter(Boolean)
+      : [];
+
+    existingBlog.focusKeyword = focusKeyword?.trim() ?? "";
+
+    // CTA
+    existingBlog.ctaText = ctaText?.trim() ?? "";
+    existingBlog.ctaLink = ctaLink?.trim() ?? "";
 
     existingBlog.status = status;
     existingBlog.featured = Boolean(featured);
