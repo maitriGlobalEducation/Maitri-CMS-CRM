@@ -3,11 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  PanelsTopLeft,
-  GraduationCap,
-  BookOpen,
-  Globe2,
   BadgePercent,
   Newspaper,
   CalendarDays,
@@ -19,9 +14,9 @@ import {
 
 const cmsItems = [
   {
-    label: "Overview",
+    label: "Homepage",
     href: "/cms",
-    icon: PanelsTopLeft,
+    icon: Home,
   },
   {
     label: "Blogs",
@@ -29,19 +24,9 @@ const cmsItems = [
     icon: Newspaper,
   },
   {
-    label: "Universities",
-    href: "/cms/universities",
-    icon: GraduationCap,
-  },
-  {
-    label: "Courses",
-    href: "/cms/courses",
-    icon: BookOpen,
-  },
-  {
-    label: "Countries",
-    href: "/cms/countries",
-    icon: Globe2,
+    label: "Testimonials",
+    href: "/cms/testimonials",
+    icon: MessageSquareQuote,
   },
   {
     label: "Scholarships",
@@ -52,16 +37,6 @@ const cmsItems = [
     label: "Events",
     href: "/cms/events",
     icon: CalendarDays,
-  },
-  {
-    label: "Testimonials",
-    href: "/cms/testimonials",
-    icon: MessageSquareQuote,
-  },
-  {
-    label: "Homepage",
-    href: "/cms/homepage",
-    icon: Home,
   },
 ];
 
@@ -86,18 +61,6 @@ export default function AdminSidebar() {
       </div>
 
       <div className="h-[calc(100vh-64px)] overflow-y-auto px-3 py-5">
-        {/* <Link
-          href="/"
-          className={`mb-6 flex items-center gap-3 rounded-lg px-3 py-2 text-sm ${
-            pathname === "/"
-              ? "bg-zinc-100 font-medium text-zinc-950"
-              : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950"
-          }`}
-        >
-          <LayoutDashboard size={18} />
-          Dashboard
-        </Link> */}
-
         <div>
           <p className="mb-2 px-3 text-xs font-medium uppercase tracking-wider text-zinc-400">
             CMS
