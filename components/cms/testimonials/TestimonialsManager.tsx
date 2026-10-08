@@ -61,7 +61,7 @@ export default function TestimonialsManager() {
     setSelectedTestimonial(testimonial);
 
     window.scrollTo({
-      top: 0,
+      top: 200,
       behavior: "smooth",
     });
   };
@@ -118,22 +118,10 @@ export default function TestimonialsManager() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-5">
       {/* FORM */}
-      <section>
+      {/* <section>
         <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-zinc-950">
-              {selectedTestimonial ? "Edit Testimonial" : "Add Testimonial"}
-            </h1>
-
-            <p className="mt-1 text-sm text-zinc-500">
-              {selectedTestimonial
-                ? "Update the testimonial details and save your changes."
-                : "Add a student testimonial to the website."}
-            </p>
-          </div>
-
           {selectedTestimonial && (
             <button
               type="button"
@@ -145,19 +133,13 @@ export default function TestimonialsManager() {
             </button>
           )}
         </div>
-
-        <TestimonialForm
-          testimonial={selectedTestimonial}
-          onCancel={handleAddTestimonial}
-          onSuccess={handleFormSuccess}
-        />
-      </section>
+      </section> */}
 
       {/* LIST */}
       <section>
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-zinc-950">
+            <h2 className="text-2xl font-semibold text-zinc-950">
               Testimonials
             </h2>
 
@@ -165,13 +147,6 @@ export default function TestimonialsManager() {
               Manage student testimonials.
             </p>
           </div>
-
-          {!selectedTestimonial && (
-            <span className="text-sm text-zinc-500">
-              {testimonials.length}{" "}
-              {testimonials.length === 1 ? "testimonial" : "testimonials"}
-            </span>
-          )}
         </div>
 
         <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
@@ -291,6 +266,25 @@ export default function TestimonialsManager() {
           )}
         </div>
       </section>
+
+      <div className="my-20">
+        <div className="my-6">
+          <h1 className="text-2xl font-semibold text-zinc-950">
+            {selectedTestimonial ? "Edit Testimonial" : "Add Testimonial"}
+          </h1>
+
+          <p className="mt-1 text-sm text-zinc-500">
+            {selectedTestimonial
+              ? "Update the testimonial details and save your changes."
+              : "Add a student testimonial to the website."}
+          </p>
+        </div>
+        <TestimonialForm
+          testimonial={selectedTestimonial}
+          onCancel={handleAddTestimonial}
+          onSuccess={handleFormSuccess}
+        />
+      </div>
 
       {/* DELETE CONFIRMATION */}
       {testimonialToDelete && (

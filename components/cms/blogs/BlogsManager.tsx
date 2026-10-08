@@ -48,7 +48,7 @@ export default function BlogsManager() {
     setSelectedBlog(blog);
 
     window.scrollTo({
-      top: 0,
+      top: 200,
       behavior: "smooth",
     });
   };
@@ -111,56 +111,16 @@ export default function BlogsManager() {
 
   return (
     <div className="space-y-10">
-      {/* BLOG FORM */}
-      <section>
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-zinc-950">
-              {selectedBlog ? "Edit Blog" : "Add Blog"}
-            </h1>
-
-            <p className="mt-1 text-sm text-zinc-500">
-              {selectedBlog
-                ? "Update the blog details and save your changes."
-                : "Create a new blog for the website."}
-            </p>
-          </div>
-
-          {selectedBlog && (
-            <button
-              type="button"
-              onClick={handleAddBlog}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
-            >
-              <Plus size={16} />
-              Add New Blog
-            </button>
-          )}
-        </div>
-
-        <BlogForm
-          blog={selectedBlog}
-          onCancel={handleAddBlog}
-          onSuccess={handleFormSuccess}
-        />
-      </section>
-
       {/* BLOG LIST */}
       <section>
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-zinc-950">Blogs</h2>
+            <h2 className="text-2xl font-semibold text-zinc-950">Blogs</h2>
 
             <p className="mt-1 text-sm text-zinc-500">
               Manage your existing blogs.
             </p>
           </div>
-
-          {!selectedBlog && (
-            <span className="text-sm text-zinc-500">
-              {blogs.length} {blogs.length === 1 ? "blog" : "blogs"}
-            </span>
-          )}
         </div>
 
         <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
@@ -242,7 +202,7 @@ export default function BlogsManager() {
 
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                        className={`inline-flex rounded-md px-2.5 py-1 text-xs font-medium ${
                           blog.status.toLowerCase() === "published"
                             ? "bg-green-100 text-green-700 border border-green-700"
                             : "bg-amber-100 text-amber-600 border border-amber-600"
@@ -287,6 +247,25 @@ export default function BlogsManager() {
           )}
         </div>
       </section>
+
+      <div className="my-20">
+        <div className="my-6">
+          <h1 className="text-2xl font-semibold text-zinc-950">
+            {selectedBlog ? "Edit Blog" : "Add Blog"}
+          </h1>
+
+          <p className="mt-1 text-sm text-zinc-500">
+            {selectedBlog
+              ? "Update the blog details and save your changes."
+              : "Add a student blog to the website."}
+          </p>
+        </div>
+        <BlogForm
+          blog={selectedBlog}
+          onCancel={handleAddBlog}
+          onSuccess={handleFormSuccess}
+        />
+      </div>
 
       {/* DELETE CONFIRMATION */}
       {blogToDelete && (

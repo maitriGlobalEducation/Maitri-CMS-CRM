@@ -70,6 +70,7 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
   const [cardImageIndex, setCardImageIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [metaKeywordsInput, setMetaKeywordsInput] = useState("");
 
   useEffect(() => {
     if (blog) {
@@ -145,6 +146,32 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
       // Don't overwrite an existing blog's slug while editing.
       slug: blog ? prev.slug : generateSlug(value),
     }));
+  };
+
+  const handleAddKeyword = () => {
+    const keyword = metaKeywordsInput.trim();
+
+    if (!keyword) return;
+
+    updateField("metaKeywords", [...formData.metaKeywords, keyword]);
+
+    setMetaKeywordsInput("");
+  };
+
+  const handleKeywordKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === ",") {
+      event.preventDefault();
+      handleAddKeyword();
+    }
+  };
+
+  const removeKeyword = (index: number) => {
+    updateField(
+      "metaKeywords",
+      formData.metaKeywords.filter((_, i) => i !== index),
+    );
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -337,24 +364,43 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
 
             <div className="grid grid-cols-2 gap-5">
               <FormField label="Meta keywords">
-                <input
-                  type="text"
-                  value={formData.metaKeywords.join(", ")}
-                  onChange={(e) =>
-                    updateField(
-                      "metaKeywords",
-                      e.target.value
-                        .split(",")
-                        .map((keyword) => keyword.trim())
-                        .filter(Boolean),
-                    )
-                  }
-                  placeholder="e.g. study abroad, Italy, Italian universities"
-                  className={inputStyles}
-                />
+                <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-200 p-2 focus-within:border-zinc-400">
+                  {formData.metaKeywords.map((keyword, index) => (
+                    <span
+                      key={`${keyword}-${index}`}
+                      className="flex items-center gap-1 rounded-md bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700"
+                    >
+                      {keyword}
+
+                      <button
+                        type="button"
+                        onClick={() => removeKeyword(index)}
+                        className="cursor-pointer text-zinc-400 hover:text-red-500"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+
+                  <input
+                    type="text"
+                    value={metaKeywordsInput}
+                    onChange={(event) =>
+                      setMetaKeywordsInput(event.target.value)
+                    }
+                    onKeyDown={handleKeywordKeyDown}
+                    onBlur={handleAddKeyword}
+                    placeholder={
+                      formData.metaKeywords.length
+                        ? "Add keyword..."
+                        : "study abroad, Italy, Italian universities"
+                    }
+                    className="min-w-50 flex-1 border-0 px-1 py-1 text-sm outline-none"
+                  />
+                </div>
 
                 <p className="mt-1.5 text-xs text-zinc-400">
-                  Separate keywords with commas.
+                  Press comma or leave the field to add a keyword.
                 </p>
               </FormField>
 

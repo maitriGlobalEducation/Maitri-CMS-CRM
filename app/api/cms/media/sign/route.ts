@@ -3,7 +3,7 @@ import cloudinary from "@/lib/cloudinary";
 
 const allowedFolders = {
   blogs: "maitri/blogs",
-  universities: "maitri/universities",
+  scholarships: "maitri/scholarships",
   countries: "maitri/countries",
   events: "maitri/events",
   testimonials: "maitri/testimonials",

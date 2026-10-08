@@ -30,7 +30,7 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 export type MediaType =
   | "blogs"
-  | "universities"
+  | "scholarships"
   | "countries"
   | "events"
   | "testimonials"
