@@ -30,7 +30,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ToastContainer
           position="top-center"
           autoClose={3000}
-          hideProgressBar
           newestOnTop
           closeOnClick
           pauseOnHover

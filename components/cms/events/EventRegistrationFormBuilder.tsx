@@ -4,8 +4,8 @@ import {
   ChevronDown,
   ChevronUp,
   GripVertical,
-  Plus,
-  Trash2,
+  // Plus,
+  // Trash2,
 } from "lucide-react";
 
 import type { EventFieldType, EventRegistrationField } from "@/types/event";
@@ -24,12 +24,12 @@ const fieldTypeLabels: Record<EventFieldType, string> = {
   checkbox: "Checkbox",
 };
 
-const createField = (): EventRegistrationField => ({
-  key: `field-${Date.now()}`,
-  label: "New Field",
-  type: "text",
-  required: false,
-});
+// const createField = (): EventRegistrationField => ({
+//   key: `field-${Date.now()}`,
+//   label: "New Field",
+//   type: "text",
+//   required: false,
+// });
 
 const defaultFields: EventRegistrationField[] = [
   {
@@ -78,13 +78,13 @@ export default function EventRegistrationFormBuilder({
     onChange(nextFields);
   };
 
-  const addField = () => {
-    onChange([...fields, createField()]);
-  };
+  // const addField = () => {
+  //   onChange([...fields, createField()]);
+  // };
 
-  const removeField = (index: number) => {
-    onChange(fields.filter((_, fieldIndex) => fieldIndex !== index));
-  };
+  // const removeField = (index: number) => {
+  //   onChange(fields.filter((_, fieldIndex) => fieldIndex !== index));
+  // };
 
   const moveField = (index: number, direction: "up" | "down") => {
     const targetIndex = direction === "up" ? index - 1 : index + 1;
@@ -142,13 +142,13 @@ export default function EventRegistrationFormBuilder({
               <ChevronDown className="h-4 w-4" />
             </button>
 
-            <button
+            {/* <button
               type="button"
               onClick={() => removeField(index)}
               className="cursor-pointer rounded-md p-1.5 text-zinc-500 transition hover:bg-white hover:text-red-600"
             >
               <Trash2 className="h-4 w-4" />
-            </button>
+            </button> */}
           </div>
 
           <div className="grid gap-4 border-t border-zinc-200 p-4 md:grid-cols-2">
@@ -208,14 +208,14 @@ export default function EventRegistrationFormBuilder({
         </div>
       ))}
 
-      <button
+      {/* <button
         type="button"
         onClick={addField}
         className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 px-4 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
       >
         <Plus className="h-4 w-4" />
         Add Field
-      </button>
+      </button> */}
     </div>
   );
 }

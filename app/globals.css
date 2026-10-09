@@ -21,6 +21,11 @@ body {
   color: var(--foreground);
 }
 
+.Toastify__toast,
+.Toastify__toast-body {
+  font-family: var(--font-geist-sans) !important;
+}
+
 /* Tiptap Blog Editor */
 
 .blog-editor.ProseMirror {

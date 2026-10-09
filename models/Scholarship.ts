@@ -59,6 +59,22 @@ const ScholarshipSchema = new Schema(
       trim: true,
     },
 
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    amount: {
+      type: String,
+      default: null,
+    },
+
+    logo: {
+      type: ScholarshipImageSchema,
+      default: null,
+    },
+
     slug: {
       type: String,
       required: true,
@@ -90,6 +106,18 @@ const ScholarshipSchema = new Schema(
     applicationForm: {
       type: ScholarshipApplicationFormSchema,
       default: () => ({ fields: [] }),
+    },
+
+    ctaLabel: {
+      type: String,
+      default: "Learn More",
+      trim: true,
+    },
+
+    ctaUrl: {
+      type: String,
+      default: "",
+      trim: true,
     },
 
     // SEO

@@ -300,7 +300,7 @@ export default function ScholarshipsManager() {
                 type="button"
                 onClick={() => setScholarshipToDelete(null)}
                 disabled={isDeleting}
-                className="h-10 rounded-lg border border-zinc-200 px-4 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50"
+                className="h-10 cursor-pointer rounded-lg border border-zinc-200 px-4 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -309,7 +309,7 @@ export default function ScholarshipsManager() {
                 type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="h-10 rounded-lg bg-red-600 px-4 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 cursor-pointer rounded-lg bg-red-600 px-4 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>

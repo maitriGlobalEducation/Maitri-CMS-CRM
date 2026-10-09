@@ -124,7 +124,7 @@ export default function EventForm({
         status: event.status,
       });
 
-      setMetaKeywordsInput("");
+      setMetaKeywordsInput((event.metaKeywords ?? []).join(", "));
 
       setImages(uniqueImages);
 
@@ -168,37 +168,6 @@ export default function EventForm({
     }));
   };
 
-  const handleAddKeyword = () => {
-    const keyword = metaKeywordsInput.trim();
-
-    if (!keyword) return;
-
-    setFormData((current) => ({
-      ...current,
-      metaKeywords: [...current.metaKeywords, keyword],
-    }));
-
-    setMetaKeywordsInput("");
-  };
-
-  const handleKeywordKeyDown = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === ",") {
-      event.preventDefault();
-      handleAddKeyword();
-    }
-  };
-
-  const removeKeyword = (index: number) => {
-    setFormData((current) => ({
-      ...current,
-      metaKeywords: current.metaKeywords.filter(
-        (_, keywordIndex) => keywordIndex !== index,
-      ),
-    }));
-  };
-
   const handleSubmit = async (
     submitEvent: React.FormEvent<HTMLFormElement>,
   ) => {
@@ -214,6 +183,15 @@ export default function EventForm({
 
       const contentImage =
         images.length > 1 ? images[contentImageIndex] : (images[0] ?? null);
+
+      const metaKeywords = [
+        ...new Set(
+          metaKeywordsInput
+            .split(",")
+            .map((keyword) => keyword.trim().toLowerCase())
+            .filter(Boolean),
+        ),
+      ];
 
       const payload = {
         title: formData.title,
@@ -233,7 +211,7 @@ export default function EventForm({
 
         metaTitle: formData.metaTitle,
         metaDescription: formData.metaDescription,
-        metaKeywords: formData.metaKeywords,
+        metaKeywords,
         focusKeyword: formData.focusKeyword,
 
         status: formData.status,
@@ -521,37 +499,18 @@ export default function EventForm({
                 Meta Keywords
               </label>
 
-              <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-200 p-2 focus-within:border-zinc-400">
-                {formData.metaKeywords.map((keyword, index) => (
-                  <span
-                    key={`${keyword}-${index}`}
-                    className="flex items-center gap-1 rounded-md bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700"
-                  >
-                    {keyword}
-
-                    <button
-                      type="button"
-                      onClick={() => removeKeyword(index)}
-                      className="cursor-pointer text-zinc-400 hover:text-red-500"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-
-                <input
-                  type="text"
+              <div className="flex flex-col gap-1.5">
+                <textarea
                   value={metaKeywordsInput}
                   onChange={(event) => setMetaKeywordsInput(event.target.value)}
-                  onKeyDown={handleKeywordKeyDown}
-                  onBlur={handleAddKeyword}
-                  placeholder={
-                    formData.metaKeywords.length
-                      ? "Add keyword..."
-                      : "scholarship, study abroad, Italy"
-                  }
-                  className="min-w-50 flex-1 border-0 px-1 py-1 text-sm outline-none"
+                  placeholder="scholarship, study abroad, Italy"
+                  rows={3}
+                  className="w-full resize-y rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none transition-colors focus:border-zinc-400"
                 />
+
+                <p className="text-xs text-zinc-400">
+                  Enter or paste multiple keywords separated by commas.
+                </p>
               </div>
 
               <p className="mt-1.5 text-xs text-zinc-400">

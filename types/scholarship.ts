@@ -18,6 +18,7 @@ export interface ScholarshipFormField {
   label: string;
   type: ScholarshipFieldType;
   required: boolean;
+  options?: string[];
 }
 
 export interface ScholarshipApplicationForm {
@@ -28,8 +29,11 @@ export interface Scholarship {
   _id: string;
 
   title: string;
+  description: string;
+  amount: string | null;
   slug: string;
 
+  logo: ScholarshipImage | null;
   cardImage: ScholarshipImage | null;
   contentImage: ScholarshipImage | null;
 
@@ -38,6 +42,9 @@ export interface Scholarship {
   content: Record<string, unknown>;
 
   applicationForm: ScholarshipApplicationForm;
+
+  ctaLabel: string;
+  ctaUrl: string;
 
   // SEO
   metaTitle: string;

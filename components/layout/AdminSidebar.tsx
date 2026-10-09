@@ -15,7 +15,7 @@ import {
 const cmsItems = [
   {
     label: "Homepage",
-    href: "/cms",
+    href: "/cms/homepage",
     icon: Home,
   },
   {

@@ -100,3 +100,60 @@ function validateImage(file: File) {
     throw new Error("Image must be smaller than 10 MB");
   }
 }
+
+export async function uploadVideo(file: File): Promise<UploadedMedia> {
+  const MAX_SIZE = 100 * 1024 * 1024;
+  const ALLOWED_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
+
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error("Please upload an MP4, WebM, or MOV video.");
+  }
+
+  if (file.size > MAX_SIZE) {
+    throw new Error("Video size must not exceed 100 MB.");
+  }
+
+  const signResponse = await fetch("/api/cms/media/sign", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ type: "homepage" }),
+  });
+
+  const signResult: SignatureResponse = await signResponse.json();
+
+  if (!signResponse.ok || !signResult.success) {
+    throw new Error(signResult.message ?? "Failed to prepare video upload");
+  }
+
+  // Read the configuration from data, just like uploadImage().
+  const { signature, timestamp, folder, cloudName, apiKey } = signResult.data;
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+  formData.append("api_key", apiKey);
+  formData.append("timestamp", timestamp.toString());
+  formData.append("signature", signature);
+  formData.append("folder", folder);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error?.message ?? "Failed to upload video");
+  }
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+  };
+}

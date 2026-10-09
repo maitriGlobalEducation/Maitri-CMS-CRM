@@ -36,12 +36,17 @@ export async function POST(request: NextRequest) {
 
     const {
       title,
+      description,
+      amount,
+      logo,
       slug,
       cardImage,
       contentImage,
       deadline,
       content,
       applicationForm,
+      ctaLabel,
+      ctaUrl,
       metaTitle,
       metaDescription,
       metaKeywords,
@@ -79,8 +84,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedSlug = slug.trim().toLowerCase();
+
     const existingScholarship = await Scholarship.findOne({
-      slug: slug.trim().toLowerCase(),
+      slug: normalizedSlug,
     });
 
     if (existingScholarship) {
@@ -94,13 +101,21 @@ export async function POST(request: NextRequest) {
     }
 
     const scholarship = await Scholarship.create({
-      title,
-      slug,
+      title: title.trim(),
+      description: description ?? "",
+      amount: amount ?? null,
+      logo: logo ?? null,
+      slug: normalizedSlug,
+
       cardImage: cardImage ?? null,
       contentImage: contentImage ?? null,
+
       deadline: deadline ? new Date(deadline) : null,
       content,
       applicationForm: applicationForm ?? { fields: [] },
+
+      ctaLabel: ctaLabel ?? "Learn More",
+      ctaUrl: ctaUrl ?? "",
 
       metaTitle: metaTitle ?? "",
       metaDescription: metaDescription ?? "",

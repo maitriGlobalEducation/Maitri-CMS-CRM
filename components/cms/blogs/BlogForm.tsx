@@ -95,6 +95,8 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
         featured: blog.featured,
       });
 
+      setMetaKeywordsInput((blog.metaKeywords ?? []).join(", "));
+
       const existingImages: UploadedMedia[] = [];
 
       if (blog.cardImage) {
@@ -115,6 +117,7 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
     }
 
     setFormData(initialFormData);
+    setMetaKeywordsInput("");
     setImages([]);
     setCardImageIndex(0);
   }, [blog]);
@@ -148,32 +151,6 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
     }));
   };
 
-  const handleAddKeyword = () => {
-    const keyword = metaKeywordsInput.trim();
-
-    if (!keyword) return;
-
-    updateField("metaKeywords", [...formData.metaKeywords, keyword]);
-
-    setMetaKeywordsInput("");
-  };
-
-  const handleKeywordKeyDown = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === ",") {
-      event.preventDefault();
-      handleAddKeyword();
-    }
-  };
-
-  const removeKeyword = (index: number) => {
-    updateField(
-      "metaKeywords",
-      formData.metaKeywords.filter((_, i) => i !== index),
-    );
-  };
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -193,8 +170,19 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
       contentImage = images[cardImageIndex === 0 ? 1 : 0];
     }
 
+    const metaKeywords = [
+      ...new Set(
+        metaKeywordsInput
+          .split(",")
+          .map((keyword) => keyword.trim())
+          .filter(Boolean)
+          .map((keyword) => keyword.toLowerCase()),
+      ),
+    ];
+
     const blogData = {
       ...formData,
+      metaKeywords,
       cardImage,
       contentImage,
     };
@@ -232,6 +220,7 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
       // Clear the form after creating a new blog
       if (!blog) {
         setFormData(initialFormData);
+        setMetaKeywordsInput("");
         setImages([]);
         setCardImageIndex(0);
       }
@@ -364,43 +353,16 @@ export default function BlogForm({ blog, onCancel, onSuccess }: BlogFormProps) {
 
             <div className="grid grid-cols-2 gap-5">
               <FormField label="Meta keywords">
-                <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-200 p-2 focus-within:border-zinc-400">
-                  {formData.metaKeywords.map((keyword, index) => (
-                    <span
-                      key={`${keyword}-${index}`}
-                      className="flex items-center gap-1 rounded-md bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700"
-                    >
-                      {keyword}
-
-                      <button
-                        type="button"
-                        onClick={() => removeKeyword(index)}
-                        className="cursor-pointer text-zinc-400 hover:text-red-500"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-
-                  <input
-                    type="text"
-                    value={metaKeywordsInput}
-                    onChange={(event) =>
-                      setMetaKeywordsInput(event.target.value)
-                    }
-                    onKeyDown={handleKeywordKeyDown}
-                    onBlur={handleAddKeyword}
-                    placeholder={
-                      formData.metaKeywords.length
-                        ? "Add keyword..."
-                        : "study abroad, Italy, Italian universities"
-                    }
-                    className="min-w-50 flex-1 border-0 px-1 py-1 text-sm outline-none"
-                  />
-                </div>
+                <textarea
+                  value={metaKeywordsInput}
+                  onChange={(event) => setMetaKeywordsInput(event.target.value)}
+                  placeholder="study abroad, Italy, Italian universities"
+                  rows={3}
+                  className={`${inputStyles} resize-y`}
+                />
 
                 <p className="mt-1.5 text-xs text-zinc-400">
-                  Press comma or leave the field to add a keyword.
+                  Enter or paste multiple keywords separated by commas.
                 </p>
               </FormField>
 

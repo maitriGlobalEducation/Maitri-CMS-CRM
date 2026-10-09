@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
-
-import type { Scholarship, ScholarshipFormField } from "@/types/scholarship";
 
 import ScholarshipImageUploader from "./ScholarshipImageUploader";
 import ScholarshipApplicationFormBuilder from "./ScholarshipApplicationFormBuilder";
 import BlogEditor from "@/components/cms/blogs/BlogEditor";
+
+import type {
+  Scholarship,
+  ScholarshipFormField,
+  ScholarshipImage,
+} from "@/types/scholarship";
+
+import { uploadImage } from "@/services/media.service";
 
 interface ScholarshipFormProps {
   scholarship: Scholarship | null;
@@ -18,7 +24,11 @@ interface ScholarshipFormProps {
 interface FormData {
   title: string;
   slug: string;
+  description: string;
+  amount: string;
   deadline: string;
+  ctaLabel: string;
+  ctaUrl: string;
   content: Record<string, unknown>;
 
   metaTitle: string;
@@ -33,15 +43,15 @@ interface FormData {
 const initialFormData: FormData = {
   title: "",
   slug: "",
+  description: "",
+  amount: "",
   deadline: "",
+  ctaLabel: "Learn More",
+  ctaUrl: "",
 
   content: {
     type: "doc",
-    content: [
-      {
-        type: "paragraph",
-      },
-    ],
+    content: [{ type: "paragraph" }],
   },
 
   metaTitle: "",
@@ -69,6 +79,10 @@ export default function ScholarshipForm({
 
   const [metaKeywordsInput, setMetaKeywordsInput] = useState("");
 
+  const [logo, setLogo] = useState<ScholarshipImage | null>(null);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
   const isEditing = Boolean(scholarship);
 
   useEffect(() => {
@@ -94,9 +108,13 @@ export default function ScholarshipForm({
           : 0;
 
       setFormData({
-        title: scholarship.title,
-        slug: scholarship.slug,
+        title: scholarship.title ?? "",
+        slug: scholarship.slug ?? "",
+        description: scholarship.description ?? "",
+        amount: scholarship.amount ?? "",
         deadline: scholarship.deadline ? scholarship.deadline.slice(0, 10) : "",
+        ctaLabel: scholarship.ctaLabel ?? "Learn More",
+        ctaUrl: scholarship.ctaUrl ?? "",
 
         content: scholarship.content,
 
@@ -109,6 +127,8 @@ export default function ScholarshipForm({
         applicationFields: scholarship.applicationForm?.fields ?? [],
       });
 
+      setLogo(scholarship.logo ?? null);
+      setMetaKeywordsInput((scholarship.metaKeywords ?? []).join(", "));
       setImages(uniqueImages);
       setCardImageIndex(loadedCardImageIndex >= 0 ? loadedCardImageIndex : 0);
       setSubmitError("");
@@ -117,9 +137,11 @@ export default function ScholarshipForm({
     }
 
     setFormData(initialFormData);
+    setMetaKeywordsInput("");
     setImages([]);
     setCardImageIndex(0);
     setSubmitError("");
+    setLogo(null);
   }, [scholarship]);
 
   const contentImageIndex = useMemo(() => {
@@ -142,33 +164,33 @@ export default function ScholarshipForm({
     }));
   };
 
-  const handleAddKeyword = () => {
-    const keyword = metaKeywordsInput.trim();
-
-    if (!keyword) return;
-
-    setFormData((current) => ({
-      ...current,
-      metaKeywords: [...current.metaKeywords, keyword],
-    }));
-
-    setMetaKeywordsInput("");
-  };
-
-  const handleKeywordKeyDown = (
-    event: React.KeyboardEvent<HTMLInputElement>,
+  const handleLogoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    if (event.key === ",") {
-      event.preventDefault();
-      handleAddKeyword();
-    }
-  };
+    const file = event.target.files?.[0];
 
-  const removeKeyword = (index: number) => {
-    setFormData((current) => ({
-      ...current,
-      metaKeywords: current.metaKeywords.filter((_, i) => i !== index),
-    }));
+    if (!file) return;
+
+    try {
+      setIsUploadingLogo(true);
+
+      const uploadedLogo = await uploadImage(file, "scholarships");
+      setLogo(uploadedLogo);
+    } catch (error) {
+      console.error("SCHOLARSHIP LOGO UPLOAD ERROR:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to upload institute logo",
+      );
+    } finally {
+      setIsUploadingLogo(false);
+
+      if (logoInputRef.current) {
+        logoInputRef.current.value = "";
+      }
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -185,9 +207,23 @@ export default function ScholarshipForm({
       const contentImage =
         images.length > 1 ? images[contentImageIndex] : (images[0] ?? null);
 
+      const metaKeywords = [
+        ...new Set(
+          metaKeywordsInput
+            .split(",")
+            .map((keyword) => keyword.trim())
+            .filter(Boolean)
+            .map((keyword) => keyword.toLowerCase()),
+        ),
+      ];
+
       const payload = {
         title: formData.title,
         slug: formData.slug,
+        description: formData.description,
+        amount: formData.amount.trim() || null,
+        logo,
+
         deadline: formData.deadline || null,
 
         cardImage,
@@ -199,9 +235,12 @@ export default function ScholarshipForm({
           fields: formData.applicationFields,
         },
 
+        ctaLabel: formData.ctaLabel,
+        ctaUrl: formData.ctaUrl,
+
         metaTitle: formData.metaTitle,
         metaDescription: formData.metaDescription,
-        metaKeywords: formData.metaKeywords,
+        metaKeywords,
         focusKeyword: formData.focusKeyword,
 
         status: formData.status,
@@ -240,7 +279,7 @@ export default function ScholarshipForm({
 
       setFormData(initialFormData);
       setImages([]);
-
+      setLogo(null);
       onSuccess();
     } catch (error) {
       console.error(
@@ -296,6 +335,24 @@ export default function ScholarshipForm({
               />
             </div>
 
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-zinc-700">
+                Short Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(event) =>
+                  setFormData((current) => ({
+                    ...current,
+                    description: event.target.value,
+                  }))
+                }
+                placeholder="Briefly describe this scholarship..."
+                rows={3}
+                className="w-full resize-y rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none transition focus:border-zinc-400"
+              />
+            </div>
+
             <div className="grid gap-5 md:grid-cols-2">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-zinc-700">
@@ -335,6 +392,27 @@ export default function ScholarshipForm({
                 />
               </div>
             </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-zinc-700">
+                Scholarship Amount
+              </label>
+              <input
+                type="text"
+                value={formData.amount}
+                onChange={(event) =>
+                  setFormData((current) => ({
+                    ...current,
+                    amount: event.target.value,
+                  }))
+                }
+                placeholder="e.g. €15,000 or 100% Tuition Fee Waiver"
+                className="h-11 w-full rounded-lg border border-zinc-200 px-3 text-sm outline-none transition focus:border-zinc-400"
+              />
+              <p className="mt-1.5 text-xs text-zinc-400">
+                Include the currency or describe the funding amount.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -357,6 +435,84 @@ export default function ScholarshipForm({
             onImagesChange={setImages}
             onCardImageIndexChange={setCardImageIndex}
           />
+        </section>
+
+        {/* Institute Logo */}
+        <section>
+          <div className="mb-5">
+            <h2 className="text-base font-semibold text-zinc-900">
+              Institute Logo
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Upload the logo of the university or institute providing this
+              scholarship.
+            </p>
+          </div>
+
+          <input
+            ref={logoInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleLogoUpload}
+            className="hidden"
+          />
+
+          {logo ? (
+            <div className="flex items-center gap-4 rounded-xl border border-zinc-200 p-4">
+              <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg border border-zinc-100 bg-white p-2">
+                <img
+                  src={logo.url}
+                  alt="Institute logo"
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-zinc-800">
+                  Institute logo uploaded
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  This logo is stored separately from the scholarship images.
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => logoInputRef.current?.click()}
+                    disabled={isUploadingLogo}
+                    className="cursor-pointer text-sm font-medium text-zinc-700 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isUploadingLogo ? "Uploading..." : "Replace logo"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setLogo(null)}
+                    disabled={isUploadingLogo}
+                    className="cursor-pointer text-sm font-medium text-red-600 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Remove logo
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => logoInputRef.current?.click()}
+              disabled={isUploadingLogo}
+              className="flex h-36 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition hover:border-zinc-300 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <span className="text-sm font-medium text-zinc-700">
+                {isUploadingLogo
+                  ? "Uploading logo..."
+                  : "Upload institute logo"}
+              </span>
+              <span className="mt-1 text-xs text-zinc-400">
+                JPG, PNG or WebP
+              </span>
+            </button>
+          )}
         </section>
 
         {/* Content */}
@@ -382,6 +538,56 @@ export default function ScholarshipForm({
                 }))
               }
             />
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section>
+          <div className="mb-5">
+            <h2 className="text-base font-semibold text-zinc-900">
+              Call to Action
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Configure the button shown for this scholarship.
+            </p>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-zinc-700">
+                Button Label
+              </label>
+              <input
+                type="text"
+                value={formData.ctaLabel}
+                onChange={(event) =>
+                  setFormData((current) => ({
+                    ...current,
+                    ctaLabel: event.target.value,
+                  }))
+                }
+                placeholder="Learn More"
+                className="h-11 w-full rounded-lg border border-zinc-200 px-3 text-sm outline-none transition focus:border-zinc-400"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-zinc-700">
+                Destination URL
+              </label>
+              <input
+                type="text"
+                value={formData.ctaUrl}
+                onChange={(event) =>
+                  setFormData((current) => ({
+                    ...current,
+                    ctaUrl: event.target.value,
+                  }))
+                }
+                placeholder="/scholarships/example or https://..."
+                className="h-11 w-full rounded-lg border border-zinc-200 px-3 text-sm outline-none transition focus:border-zinc-400"
+              />
+            </div>
           </div>
         </section>
 
@@ -466,41 +672,16 @@ export default function ScholarshipForm({
                 Meta Keywords
               </label>
 
-              <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-200 p-2 focus-within:border-zinc-400">
-                {formData.metaKeywords.map((keyword, index) => (
-                  <span
-                    key={`${keyword}-${index}`}
-                    className="flex items-center gap-1 rounded-md bg-zinc-100 px-2.5 py-1 text-xs text-zinc-700"
-                  >
-                    {keyword}
-
-                    <button
-                      type="button"
-                      onClick={() => removeKeyword(index)}
-                      className="cursor-pointer text-zinc-400 hover:text-red-500"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-
-                <input
-                  type="text"
-                  value={metaKeywordsInput}
-                  onChange={(event) => setMetaKeywordsInput(event.target.value)}
-                  onKeyDown={handleKeywordKeyDown}
-                  onBlur={handleAddKeyword}
-                  placeholder={
-                    formData.metaKeywords.length
-                      ? "Add keyword..."
-                      : "scholarship, study abroad, Italy scholarship"
-                  }
-                  className="min-w-50 flex-1 border-0 px-1 py-1 text-sm outline-none"
-                />
-              </div>
+              <textarea
+                value={metaKeywordsInput}
+                onChange={(event) => setMetaKeywordsInput(event.target.value)}
+                placeholder="scholarship, study abroad, Italy scholarship, university funding"
+                rows={3}
+                className="w-full resize-y rounded-lg border border-zinc-200 px-3 py-2.5 text-sm outline-none transition focus:border-zinc-400"
+              />
 
               <p className="mt-1.5 text-xs text-zinc-400">
-                Press comma or leave the field to add a keyword.
+                Enter or paste multiple keywords separated by commas.
               </p>
             </div>
 

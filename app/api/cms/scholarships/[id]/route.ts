@@ -17,10 +17,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid scholarship ID",
-        },
+        { success: false, message: "Invalid scholarship ID" },
         { status: 400 },
       );
     }
@@ -31,10 +28,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
 
     if (!scholarship) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Scholarship not found",
-        },
+        { success: false, message: "Scholarship not found" },
         { status: 404 },
       );
     }
@@ -47,10 +41,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
     console.error("GET SCHOLARSHIP ERROR:", error);
 
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch scholarship",
-      },
+      { success: false, message: "Failed to fetch scholarship" },
       { status: 500 },
     );
   }
@@ -62,10 +53,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid scholarship ID",
-        },
+        { success: false, message: "Invalid scholarship ID" },
         { status: 400 },
       );
     }
@@ -76,12 +64,17 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
     const {
       title,
+      description,
+      amount,
+      logo,
       slug,
       cardImage,
       contentImage,
       deadline,
       content,
       applicationForm,
+      ctaLabel,
+      ctaUrl,
       metaTitle,
       metaDescription,
       metaKeywords,
@@ -91,30 +84,21 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
     if (!title?.trim()) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Title is required",
-        },
+        { success: false, message: "Title is required" },
         { status: 400 },
       );
     }
 
     if (!slug?.trim()) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Slug is required",
-        },
+        { success: false, message: "Slug is required" },
         { status: 400 },
       );
     }
 
     if (!content) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Scholarship content is required",
-        },
+        { success: false, message: "Scholarship content is required" },
         { status: 400 },
       );
     }
@@ -140,12 +124,21 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       id,
       {
         title: title.trim(),
+        description: description ?? "",
+        amount: amount ?? null,
+        logo: logo ?? null,
         slug: normalizedSlug,
+
         cardImage: cardImage ?? null,
         contentImage: contentImage ?? null,
+
         deadline: deadline ? new Date(deadline) : null,
         content,
         applicationForm: applicationForm ?? { fields: [] },
+
+        ctaLabel: ctaLabel ?? "Learn More",
+        ctaUrl: ctaUrl ?? "",
+
         status: status ?? "draft",
         metaTitle: metaTitle ?? "",
         metaDescription: metaDescription ?? "",
@@ -160,10 +153,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
     if (!scholarship) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Scholarship not found",
-        },
+        { success: false, message: "Scholarship not found" },
         { status: 404 },
       );
     }
@@ -176,10 +166,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     console.error("UPDATE SCHOLARSHIP ERROR:", error);
 
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to update scholarship",
-      },
+      { success: false, message: "Failed to update scholarship" },
       { status: 500 },
     );
   }
@@ -191,10 +178,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid scholarship ID",
-        },
+        { success: false, message: "Invalid scholarship ID" },
         { status: 400 },
       );
     }
@@ -205,10 +189,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
 
     if (!scholarship) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Scholarship not found",
-        },
+        { success: false, message: "Scholarship not found" },
         { status: 404 },
       );
     }
@@ -216,6 +197,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     const publicIds = [
       scholarship.cardImage?.publicId,
       scholarship.contentImage?.publicId,
+      scholarship.logo?.publicId,
     ].filter(Boolean);
 
     const uniquePublicIds = [...new Set(publicIds)];
@@ -240,10 +222,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     console.error("DELETE SCHOLARSHIP ERROR:", error);
 
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to delete scholarship",
-      },
+      { success: false, message: "Failed to delete scholarship" },
       { status: 500 },
     );
   }
