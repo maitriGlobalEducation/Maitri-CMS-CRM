@@ -1,23 +1,27 @@
-// src/types/university.ts
-
 export type UniversityStatus = "draft" | "published";
 
-export interface University {
-  id: string;
+export interface UniversityImage {
+  url: string;
+  publicId: string;
+}
 
+export interface University {
+  _id: string;
   name: string;
   slug: string;
-
   country: string;
-  city: string;
 
-  shortDescription: string;
+  logo: UniversityImage | null;
+
+  reportLabel: string;
+  reportYear: string;
+
+  title: string;
   description: string;
 
-  logoUrl: string;
-  coverImageUrl: string;
+  ctaLabel: string;
+  ctaUrl: string;
 
-  featured: boolean;
   status: UniversityStatus;
 
   createdAt: string;

@@ -1,26 +1,43 @@
-// src/data/mockUniversities.ts
+// src/services/university.service.ts
 
-import { University } from "@/types/university";
+import "server-only";
 
-export const mockUniversities: University[] = [
-  {
-    id: "1",
-    name: "Domus Academy",
-    slug: "domus-academy",
+import { connectDB } from "@/lib/mongodb";
+import UniversityModel from "@/models/University";
+import type { University } from "@/types/university";
 
-    country: "Italy",
-    city: "Milan",
+export async function getUniversities(): Promise<University[]> {
+  await connectDB();
 
-    shortDescription: "International design academy in Milan.",
-    description: "University description goes here.",
+  const universities = await UniversityModel.find()
+    .sort({ createdAt: -1 })
+    .lean();
 
-    logoUrl: "/universities/domus-logo.png",
-    coverImageUrl: "/universities/domus-cover.jpg",
+  return universities.map((university) => ({
+    ...university,
+    id: university._id.toString(),
+    _id: undefined,
+  })) as unknown as University[];
+}
 
-    featured: true,
-    status: "published",
+export async function getUniversityById(
+  id: string,
+): Promise<University | null> {
+  await connectDB();
 
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+  if (!/^[a-f\d]{24}$/i.test(id)) {
+    return null;
+  }
+
+  const university = await UniversityModel.findById(id).lean();
+
+  if (!university) {
+    return null;
+  }
+
+  return {
+    ...university,
+    id: university._id.toString(),
+    _id: undefined,
+  } as unknown as University;
+}

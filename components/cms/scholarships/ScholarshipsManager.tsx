@@ -110,7 +110,29 @@ export default function ScholarshipsManager() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      {/* Form */}
+      <div>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-zinc-950">
+            {selectedScholarship ? "Edit Scholarship" : "Add Scholarship"}
+          </h1>
+
+          <p className="mt-1 text-sm text-zinc-500">
+            {selectedScholarship
+              ? "Update the scholarship details and save your changes."
+              : "Add a student scholarship to the website."}
+          </p>
+        </div>
+
+        {/* Form */}
+        <ScholarshipForm
+          scholarship={selectedScholarship}
+          onSuccess={handleSuccess}
+          onCancel={() => setSelectedScholarship(null)}
+        />
+      </div>
+
+      {/* List */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
@@ -122,8 +144,6 @@ export default function ScholarshipsManager() {
           </p>
         </div>
       </div>
-
-      {/* List */}
       <section>
         {isLoading ? (
           <div className="rounded-xl border border-zinc-200 bg-white px-6 py-12 text-center text-sm text-zinc-500">
@@ -250,27 +270,6 @@ export default function ScholarshipsManager() {
           </div>
         )}
       </section>
-
-      <div className="my-20">
-        <div className="my-6">
-          <h1 className="text-2xl font-semibold text-zinc-950">
-            {selectedScholarship ? "Edit Scholarship" : "Add Scholarship"}
-          </h1>
-
-          <p className="mt-1 text-sm text-zinc-500">
-            {selectedScholarship
-              ? "Update the scholarship details and save your changes."
-              : "Add a student scholarship to the website."}
-          </p>
-        </div>
-
-        {/* Form */}
-        <ScholarshipForm
-          scholarship={selectedScholarship}
-          onSuccess={handleSuccess}
-          onCancel={() => setSelectedScholarship(null)}
-        />
-      </div>
 
       {/* Delete Confirmation */}
       {scholarshipToDelete && (

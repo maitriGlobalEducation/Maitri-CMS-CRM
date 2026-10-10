@@ -34,7 +34,9 @@ export type MediaType =
   | "countries"
   | "events"
   | "testimonials"
-  | "homepage";
+  | "homepage"
+  | "universities"
+  | "career-choices";
 
 export async function uploadImage(
   file: File,

@@ -112,6 +112,25 @@ export default function BlogsManager() {
   return (
     <div className="space-y-10">
       {/* BLOG LIST */}
+      <div>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-zinc-950">
+            {selectedBlog ? "Edit Blog" : "Add Blog"}
+          </h1>
+
+          <p className="mt-1 text-sm text-zinc-500">
+            {selectedBlog
+              ? "Update the blog details and save your changes."
+              : "Add a student blog to the website."}
+          </p>
+        </div>
+        <BlogForm
+          blog={selectedBlog}
+          onCancel={handleAddBlog}
+          onSuccess={handleFormSuccess}
+        />
+      </div>
+
       <section>
         <div className="mb-5 flex items-center justify-between">
           <div>
@@ -247,25 +266,6 @@ export default function BlogsManager() {
           )}
         </div>
       </section>
-
-      <div className="my-20">
-        <div className="my-6">
-          <h1 className="text-2xl font-semibold text-zinc-950">
-            {selectedBlog ? "Edit Blog" : "Add Blog"}
-          </h1>
-
-          <p className="mt-1 text-sm text-zinc-500">
-            {selectedBlog
-              ? "Update the blog details and save your changes."
-              : "Add a student blog to the website."}
-          </p>
-        </div>
-        <BlogForm
-          blog={selectedBlog}
-          onCancel={handleAddBlog}
-          onSuccess={handleFormSuccess}
-        />
-      </div>
 
       {/* DELETE CONFIRMATION */}
       {blogToDelete && (

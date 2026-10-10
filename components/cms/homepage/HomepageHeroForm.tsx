@@ -69,23 +69,30 @@ export default function HomepageHeroForm({ hero, onChange }: Props) {
 
   return (
     <div className="space-y-6 rounded-xl border border-zinc-200 bg-white p-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between rounded-lg border border-zinc-200 p-4">
         <div>
-          <h2 className="text-lg font-semibold text-zinc-900">Hero Section</h2>
-          <p className="mt-1 text-sm text-zinc-500">
-            Configure the homepage banner and its call-to-action buttons.
+          <p className="text-sm font-medium text-zinc-900">Show Hero Section</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            Control whether this section appears on the homepage.
           </p>
         </div>
 
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700">
-          <input
-            type="checkbox"
-            checked={hero.isVisible}
-            onChange={(e) => updateField("isVisible", e.target.checked)}
-            className="accent-zinc-900"
+        <button
+          type="button"
+          role="switch"
+          aria-checked={hero.isVisible}
+          aria-label="Show Hero Section"
+          onClick={() => updateField("isVisible", !hero.isVisible)}
+          className={`relative flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 ${
+            hero.isVisible ? "bg-zinc-900" : "bg-zinc-300"
+          }`}
+        >
+          <span
+            className={`pointer-events-none absolute left-0.5 size-5 rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out ${
+              hero.isVisible ? "translate-x-5" : "translate-x-0"
+            }`}
           />
-          Visible
-        </label>
+        </button>
       </div>
 
       <div className="space-y-3">

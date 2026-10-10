@@ -10,9 +10,11 @@ import { getHomepage, updateHomepage } from "@/services/homepage.service";
 import HomepageHeroForm from "./HomepageHeroForm";
 import HomepageLocationsForm from "./HomepageLocationsForm";
 import type { HomepageLocationsContent } from "@/types/homepage";
-import HomepageAdmissionsForm from "./HomepageAdmissionsForm";
+import UniversityManager from "@/components/cms/universities/UniversityManager";
 import type { HomepageAdmissionsContent } from "@/types/homepage";
 import HomepageSectionCard from "./HomepageSectionCard";
+import HomepageCareerChoicesForm from "./HomepageCareerChoicesForm";
+import type { HomepageCareerChoicesContent } from "@/types/homepage";
 
 const emptyAboutContent: HomepageAboutContent = {
   image: null,
@@ -51,29 +53,28 @@ export default function HomepageManager() {
   const handleSave = async () => {
     if (!homepage) return;
 
+    setIsSaving(true);
+
     try {
-      setIsSaving(true);
+      const savedHomepage = await toast.promise(updateHomepage(homepage), {
+        pending: "Saving homepage changes...",
+        success: "Homepage saved successfully",
+        error: {
+          render({ data }) {
+            return data instanceof Error
+              ? data.message
+              : "Failed to save homepage";
+          },
+        },
+      });
 
-      const savedHomepage = await updateHomepage(homepage);
       setHomepage(savedHomepage);
-
-      toast.success("Homepage saved successfully");
-
-      // window.scrollTo({
-      //   top: 0,
-      //   behavior: "smooth",
-      // });
     } catch (error) {
       console.error(error);
-
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save homepage",
-      );
     } finally {
       setIsSaving(false);
     }
   };
-
   const aboutSection = homepage?.sections.find(
     (section) => section.type === "about",
   );
@@ -113,6 +114,10 @@ export default function HomepageManager() {
       };
     });
   };
+
+  const universitiesSection = homepage?.sections.find(
+    (section) => section.type === "universities",
+  );
 
   const locationsSection = homepage?.sections.find(
     (section) => section.type === "locations",
@@ -221,84 +226,106 @@ export default function HomepageManager() {
     });
   };
 
-  const emptyAdmissionsContent: HomepageAdmissionsContent = {
-    heading: "",
-    navigationLinks: [
-      { label: "", url: "" },
-      { label: "", url: "" },
-      { label: "", url: "" },
-    ],
-  };
-
-  const admissionsSection = homepage?.sections.find(
-    (section) => section.type === "admissions",
-  );
-
-  const admissionsContent: HomepageAdmissionsContent = {
-    ...emptyAdmissionsContent,
-    ...(admissionsSection?.content as
-      | Partial<HomepageAdmissionsContent>
-      | undefined),
-    navigationLinks: Array.from({ length: 3 }, (_, index) => ({
-      ...emptyAdmissionsContent.navigationLinks[index],
-      ...(
-        admissionsSection?.content as
-          | Partial<HomepageAdmissionsContent>
-          | undefined
-      )?.navigationLinks?.[index],
-    })),
-  };
-
-  const updateAdmissionsContent = (content: HomepageAdmissionsContent) => {
+  const updateUniversitiesVisibility = (isVisible: boolean) => {
     setHomepage((current) => {
       if (!current) return current;
 
       const existing = current.sections.find(
-        (section) => section.type === "admissions",
+        (section) => section.type === "universities",
       );
 
-      const admissions: HomepageSection = {
-        type: "admissions",
-        isVisible: existing?.isVisible ?? false,
-        order: existing?.order ?? 3,
+      const universities: HomepageSection = {
+        type: "universities",
+        isVisible,
+        order: existing?.order ?? 4,
+        content: existing?.content ?? {},
+      };
+
+      return {
+        ...current,
+        sections: existing
+          ? current.sections.map((section) =>
+              section.type === "universities" ? universities : section,
+            )
+          : [...current.sections, universities],
+      };
+    });
+  };
+
+  const emptyCareerChoicesContent: HomepageCareerChoicesContent = {
+    heading: "Elite Career Choices",
+    cards: [],
+  };
+
+  const careerChoicesSection = homepage?.sections.find(
+    (section) => section.type === "careerChoices",
+  );
+
+  const careerChoicesContent: HomepageCareerChoicesContent = {
+    ...emptyCareerChoicesContent,
+    ...(careerChoicesSection?.content as
+      | Partial<HomepageCareerChoicesContent>
+      | undefined),
+    cards:
+      (
+        careerChoicesSection?.content as
+          | Partial<HomepageCareerChoicesContent>
+          | undefined
+      )?.cards ?? [],
+  };
+
+  const updateCareerChoicesContent = (
+    content: HomepageCareerChoicesContent,
+  ) => {
+    setHomepage((current) => {
+      if (!current) return current;
+
+      const existingSection = current.sections.find(
+        (section) => section.type === "careerChoices",
+      );
+
+      const careerChoices: HomepageSection = {
+        type: "careerChoices",
+        isVisible: existingSection?.isVisible ?? false,
+        order: existingSection?.order ?? 5,
         content: content as unknown as Record<string, unknown>,
       };
 
       return {
         ...current,
-        sections: existing
+        sections: existingSection
           ? current.sections.map((section) =>
-              section.type === "admissions" ? admissions : section,
+              section.type === "careerChoices" ? careerChoices : section,
             )
-          : [...current.sections, admissions],
+          : [...current.sections, careerChoices],
       };
     });
   };
 
-  const updateAdmissionsVisibility = (isVisible: boolean) => {
+  const updateCareerChoicesVisibility = (isVisible: boolean) => {
     setHomepage((current) => {
       if (!current) return current;
 
-      const existing = current.sections.find(
-        (section) => section.type === "admissions",
+      const existingSection = current.sections.find(
+        (section) => section.type === "careerChoices",
       );
 
-      const admissions: HomepageSection = {
-        type: "admissions",
+      const careerChoices: HomepageSection = {
+        type: "careerChoices",
         isVisible,
-        order: existing?.order ?? 3,
+        order: existingSection?.order ?? 5,
         content:
-          existing?.content ??
-          (emptyAdmissionsContent as unknown as Record<string, unknown>),
+          existingSection?.content ??
+          (emptyCareerChoicesContent as unknown as Record<string, unknown>),
       };
 
       return {
         ...current,
-        sections: existing
+        sections: existingSection
           ? current.sections.map((section) =>
-              section.type === "admissions" ? admissions : section,
+              section.type === "careerChoices" ? careerChoices : section,
             )
-          : [...current.sections, admissions],
+          : [...current.sections, careerChoices],
       };
     });
   };
@@ -378,18 +405,29 @@ export default function HomepageManager() {
           />
         </HomepageSectionCard>
 
-        {/* <HomepageSectionCard
+        <HomepageSectionCard
           number="04"
-          title="Admissions & Scholarship"
-          description="Section heading and three navigation links"
+          title="Universities"
+          description="Manage university logos, background images, highlights and links"
         >
-          <HomepageAdmissionsForm
-            content={admissionsContent}
-            isVisible={admissionsSection?.isVisible ?? false}
-            onChange={updateAdmissionsContent}
-            onVisibilityChange={updateAdmissionsVisibility}
+          <UniversityManager
+            isVisible={universitiesSection?.isVisible ?? false}
+            onVisibilityChange={updateUniversitiesVisibility}
           />
-        </HomepageSectionCard> */}
+        </HomepageSectionCard>
+
+        <HomepageSectionCard
+          number="05"
+          title="Elite Career Choices"
+          description="Manage career cards, images, categories and source names"
+        >
+          <HomepageCareerChoicesForm
+            content={careerChoicesContent}
+            onChange={updateCareerChoicesContent}
+            isVisible={careerChoicesSection?.isVisible ?? false}
+            onVisibilityChange={updateCareerChoicesVisibility}
+          />
+        </HomepageSectionCard>
       </div>
 
       <div className="rounded-xl border border-dashed border-zinc-300 p-6">

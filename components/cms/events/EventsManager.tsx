@@ -43,7 +43,7 @@ export default function EventsManager() {
     setSelectedEvent(event);
     setShowForm(true);
     window.scrollTo({
-      top: 200,
+      top: 0,
       behavior: "smooth",
     });
   };
@@ -111,6 +111,24 @@ export default function EventsManager() {
 
   return (
     <div className="space-y-6">
+      <div>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-zinc-950">
+            {selectedEvent ? "Edit Event" : "Add Event"}
+          </h1>
+
+          <p className="mt-1 text-sm text-zinc-500">
+            {selectedEvent
+              ? "Update the event details and save your changes."
+              : "Add an event to the website."}
+          </p>
+        </div>
+        <EventForm
+          event={selectedEvent}
+          onSuccess={handleSuccess}
+          onCancel={handleCancel}
+        />
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -258,25 +276,6 @@ export default function EventsManager() {
             </table>
           </div>
         )}
-      </div>
-
-      <div className="my-20">
-        <div className="my-6">
-          <h1 className="text-2xl font-semibold text-zinc-950">
-            {selectedEvent ? "Edit Event" : "Add Event"}
-          </h1>
-
-          <p className="mt-1 text-sm text-zinc-500">
-            {selectedEvent
-              ? "Update the event details and save your changes."
-              : "Add an event to the website."}
-          </p>
-        </div>
-        <EventForm
-          event={selectedEvent}
-          onSuccess={handleSuccess}
-          onCancel={handleCancel}
-        />
       </div>
     </div>
   );

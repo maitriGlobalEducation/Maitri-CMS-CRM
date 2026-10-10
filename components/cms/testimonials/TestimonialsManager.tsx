@@ -51,17 +51,17 @@ export default function TestimonialsManager() {
   const handleAddTestimonial = () => {
     setSelectedTestimonial(null);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    // window.scrollTo({
+    //   top: 0,
+    //   behavior: "smooth",
+    // });
   };
 
   const handleEditTestimonial = (testimonial: Testimonial) => {
     setSelectedTestimonial(testimonial);
 
     window.scrollTo({
-      top: 200,
+      top: 0,
       behavior: "smooth",
     });
   };
@@ -71,10 +71,10 @@ export default function TestimonialsManager() {
 
     await fetchTestimonials();
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    // window.scrollTo({
+    //   top: 0,
+    //   behavior: "smooth",
+    // });
   };
 
   const handleDeleteTestimonial = async () => {
@@ -119,21 +119,25 @@ export default function TestimonialsManager() {
 
   return (
     <div className="space-y-5">
-      {/* FORM */}
-      {/* <section>
-        <div className="mb-6 flex items-center justify-between">
-          {selectedTestimonial && (
-            <button
-              type="button"
-              onClick={handleAddTestimonial}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
-            >
-              <Plus size={16} />
-              Add New Testimonial
-            </button>
-          )}
+      {/* Form */}
+      <div>
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-zinc-950">
+            {selectedTestimonial ? "Edit Testimonial" : "Add Testimonial"}
+          </h1>
+
+          <p className="mt-1 text-sm text-zinc-500">
+            {selectedTestimonial
+              ? "Update the testimonial details and save your changes."
+              : "Add a student testimonial to the website."}
+          </p>
         </div>
-      </section> */}
+        <TestimonialForm
+          testimonial={selectedTestimonial}
+          onCancel={handleAddTestimonial}
+          onSuccess={handleFormSuccess}
+        />
+      </div>
 
       {/* LIST */}
       <section>
@@ -266,25 +270,6 @@ export default function TestimonialsManager() {
           )}
         </div>
       </section>
-
-      <div className="my-20">
-        <div className="my-6">
-          <h1 className="text-2xl font-semibold text-zinc-950">
-            {selectedTestimonial ? "Edit Testimonial" : "Add Testimonial"}
-          </h1>
-
-          <p className="mt-1 text-sm text-zinc-500">
-            {selectedTestimonial
-              ? "Update the testimonial details and save your changes."
-              : "Add a student testimonial to the website."}
-          </p>
-        </div>
-        <TestimonialForm
-          testimonial={selectedTestimonial}
-          onCancel={handleAddTestimonial}
-          onSuccess={handleFormSuccess}
-        />
-      </div>
 
       {/* DELETE CONFIRMATION */}
       {testimonialToDelete && (

@@ -512,10 +512,6 @@ export default function EventForm({
                   Enter or paste multiple keywords separated by commas.
                 </p>
               </div>
-
-              <p className="mt-1.5 text-xs text-zinc-400">
-                Press comma or leave the field to add a keyword.
-              </p>
             </div>
 
             <div>

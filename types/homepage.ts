@@ -72,3 +72,19 @@ export interface HomepageAdmissionsContent {
   heading: string;
   navigationLinks: HomepageNavigationLink[];
 }
+
+export interface HomepageCareerChoiceCard {
+  id: string;
+  image: {
+    url: string;
+    publicId: string;
+  } | null;
+  tags: string[];
+  title: string;
+  source: string;
+}
+
+export interface HomepageCareerChoicesContent {
+  heading: string;
+  cards: HomepageCareerChoiceCard[];
+}
